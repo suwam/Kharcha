@@ -1,0 +1,35 @@
+{
+    "name": "kharcha",
+    "short_name": "kharcha",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0175C2",
+    "theme_color": "#0175C2",
+    "description": "Kharcha – Your Smart Expense Tracker  Kharcha is an intuitive and feature-rich mobile application designed to help you manage your personal finances effortlessly. With Kharcha, users can track daily expenses, set budget limits, monitor multiple wallets (cash, eSewa, bank accounts), and visualize spending patterns with interactive graphs like pie charts and bar charts.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
