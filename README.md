@@ -1,6 +1,7 @@
-# kharcha
+# Kharcha
 
-Kharcha – Your Smart Expense Tracker  Kharcha is an intuitive and feature-rich mobile application designed to help you manage your personal finances effortlessly. With Kharcha, users can track daily expenses, set budget limits, monitor multiple wallets (cash, eSewa, bank accounts), and visualize spending patterns with interactive graphs like pie charts and bar charts.
+Kharcha 
+Your Smart Expense Tracker  Kharcha is an intuitive and feature-rich mobile application designed to help you manage your personal finances effortlessly. With Kharcha, users can track daily expenses, set budget limits, monitor multiple wallets (cash, eSewa, bank accounts), and visualize spending patterns with interactive graphs like pie charts and bar charts.
 
 ## Getting Started
 
