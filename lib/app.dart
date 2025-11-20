@@ -17,7 +17,7 @@ class KharchaApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       themeMode: ThemeMode.system,
-      home: const DashboardPage(),
+      home: DashboardPage(),
     );
   }
 }

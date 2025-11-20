@@ -8,7 +8,38 @@ class AddTransactionPage extends StatefulWidget {
 }
 
 class _AddTransactionPageState extends State<AddTransactionPage> {
-  String selectedType = "Expense";
+  String transactionType = "Expense"; // default
+  String? selectedCategory;
+  String? selectedWallet;
+  DateTime selectedDate = DateTime.now();
+
+  final TextEditingController amountController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
+
+  // Temporary data (will replace with Hive models)
+  final List<String> expenseCategories = [
+    "Food",
+    "Transport",
+    "Shopping",
+    "Fuel",
+    "Bills",
+    "Others"
+  ];
+
+  final List<String> incomeCategories = [
+    "Salary",
+    "Bonus",
+    "Pocket Money",
+    "Business",
+    "Others"
+  ];
+
+  final List<String> wallets = [
+    "Cash",
+    "eSewa",
+    "Bank",
+    "Khalti",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -24,34 +55,46 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // Transaction Type Selector (Expense / Income)
+            // ====================================
+            // TYPE TOGGLE (Expense / Income)
+            // ====================================
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ChoiceChip(
                   label: const Text("Expense"),
-                  selected: selectedType == "Expense",
+                  selected: transactionType == "Expense",
                   onSelected: (value) {
-                    setState(() => selectedType = "Expense");
+                    setState(() {
+                      transactionType = "Expense";
+                      selectedCategory = null;
+                    });
                   },
                 ),
+                const SizedBox(width: 10),
                 ChoiceChip(
                   label: const Text("Income"),
-                  selected: selectedType == "Income",
+                  selected: transactionType == "Income",
                   onSelected: (value) {
-                    setState(() => selectedType = "Income");
+                    setState(() {
+                      transactionType = "Income";
+                      selectedCategory = null;
+                    });
                   },
                 ),
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
 
-            // Amount input
+            // ====================================
+            // AMOUNT INPUT
+            // ====================================
             const Text("Amount", style: TextStyle(fontSize: 16)),
             TextField(
+              controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Enter amount",
                 border: OutlineInputBorder(),
               ),
@@ -59,16 +102,28 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
             const SizedBox(height: 20),
 
-            // Category selector
+            // ====================================
+            // CATEGORY DROPDOWN
+            // ====================================
             const Text("Category", style: TextStyle(fontSize: 16)),
             DropdownButtonFormField(
-              items: const [
-                DropdownMenuItem(value: "Food", child: Text("Food")),
-                DropdownMenuItem(value: "Transport", child: Text("Transport")),
-                DropdownMenuItem(value: "Shopping", child: Text("Shopping")),
-                DropdownMenuItem(value: "Salary", child: Text("Salary")),
-              ],
-              onChanged: (value) {},
+              value: selectedCategory,
+              items: (transactionType == "Expense"
+                  ? expenseCategories
+                  : incomeCategories)
+                  .map(
+                    (cat) {
+                  return DropdownMenuItem(
+                    value: cat,
+                    child: Text(cat),
+                  );
+                },
+              ).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCategory = value;
+                });
+              },
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
               ),
@@ -76,15 +131,23 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
             const SizedBox(height: 20),
 
-            // Wallet selector
+            // ====================================
+            // WALLET DROPDOWN
+            // ====================================
             const Text("Wallet", style: TextStyle(fontSize: 16)),
             DropdownButtonFormField(
-              items: const [
-                DropdownMenuItem(value: "Cash", child: Text("Cash")),
-                DropdownMenuItem(value: "eSewa", child: Text("eSewa")),
-                DropdownMenuItem(value: "Bank", child: Text("Bank")),
-              ],
-              onChanged: (value) {},
+              value: selectedWallet,
+              items: wallets.map((w) {
+                return DropdownMenuItem(
+                  value: w,
+                  child: Text(w),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedWallet = value;
+                });
+              },
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
               ),
@@ -92,42 +155,102 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
             const SizedBox(height: 20),
 
-            // Date selector (BS/AD)
-            const Text("Date (AD/BS)", style: TextStyle(fontSize: 16)),
-            TextField(
-              readOnly: true,
-              decoration: InputDecoration(
-                hintText: "Select date",
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.calendar_month),
+            // ====================================
+            // DATE PICKER
+            // ====================================
+            const Text("Date", style: TextStyle(fontSize: 16)),
+            InkWell(
+              onTap: () async {
+                DateTime? picked = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime(2035),
+                  initialDate: selectedDate,
+                );
+                if (picked != null) {
+                  setState(() => selectedDate = picked);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${selectedDate.year}-${selectedDate.month}-${selectedDate.day}",
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Icon(Icons.calendar_month),
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // Notes
+            // ====================================
+            // NOTES
+            // ====================================
             const Text("Notes", style: TextStyle(fontSize: 16)),
             TextField(
+              controller: noteController,
               maxLines: 3,
-              decoration: InputDecoration(
-                hintText: "Enter notes",
+              decoration: const InputDecoration(
+                hintText: "Write additional note (optional)",
                 border: OutlineInputBorder(),
               ),
             ),
 
             const SizedBox(height: 30),
 
-            // Save button
+            // ====================================
+            // SAVE BUTTON
+            // ====================================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Save Transaction"),
+                onPressed: () {
+                  _validateAndSave();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurpleAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text(
+                  "Save Transaction",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  // ===============================================================
+  // VALIDATION LOGIC (REAL SAVE WILL BE CONNECTED TO HIVE NEXT)
+  // ===============================================================
+  void _validateAndSave() {
+    if (amountController.text.isEmpty ||
+        selectedCategory == null ||
+        selectedWallet == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all required fields")),
+      );
+      return;
+    }
+
+    // TODO: Save to Hive DB later
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Transaction Saved (Demo Mode)")),
+    );
+
+    Navigator.pop(context);
   }
 }

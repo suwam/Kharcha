@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-
-// CORRECT IMPORT (go up 2 folders → into transactions/)
 import '../transactions/add_transaction.dart';
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+  DashboardPage({super.key});
+
+  // Temporary list (will be replaced with Hive DB)
+  final List<Map<String, dynamic>> recentTransactions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -17,14 +18,15 @@ class DashboardPage extends StatelessWidget {
         centerTitle: true,
       ),
 
-      // Main Body
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
+            // ================================
             // SUMMARY CARDS
+            // ================================
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -36,7 +38,9 @@ class DashboardPage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
+            // ================================
             // PIE CHART PLACEHOLDER
+            // ================================
             Container(
               height: 180,
               width: double.infinity,
@@ -54,6 +58,9 @@ class DashboardPage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
+            // ================================
+            // RECENT TRANSACTIONS TITLE
+            // ================================
             const Text(
               "Recent Transactions",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -61,18 +68,41 @@ class DashboardPage extends StatelessWidget {
 
             const SizedBox(height: 15),
 
-            // RECENT TRANSACTION (STATIC FOR NOW)
-            _buildTransactionTile("Food", "Rs 350", "Cash"),
-            _buildTransactionTile("Transport", "Rs 120", "eSewa"),
-            _buildTransactionTile("Shopping", "Rs 2400", "Bank"),
-            _buildTransactionTile("Salary", "+ Rs 22,000", "Bank"),
+            // ================================
+            // IF NO TRANSACTIONS
+            // ================================
+            if (recentTransactions.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: Center(
+                  child: Text(
+                    "No transactions yet",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                ),
+              )
+            else
+            // ================================
+            // LIST OF RECENT TRANSACTIONS
+            // ================================
+              Column(
+                children: recentTransactions.map((tx) {
+                  return _buildTransactionTile(
+                    tx["category"],
+                    tx["amount"],
+                    tx["wallet"],
+                  );
+                }).toList(),
+              ),
 
             const SizedBox(height: 80),
           ],
         ),
       ),
 
-      // Floating Add Button
+      // ================================
+      // ADD TRANSACTION BUTTON
+      // ================================
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -80,14 +110,15 @@ class DashboardPage extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const AddTransactionPage()),
           );
         },
+        backgroundColor: Colors.deepPurpleAccent,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  // ---------------------------------------------------
-  // Summary Card Widget
-  // ---------------------------------------------------
+  // ======================================================
+  // SUMMARY CARD WIDGET
+  // ======================================================
   Widget _buildSummaryCard(String title, String amount, Color color) {
     return Container(
       height: 90,
@@ -102,19 +133,22 @@ class DashboardPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(title,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
+              style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.bold, color: color)),
           const SizedBox(height: 8),
           Text(amount,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
   }
 
-  // ---------------------------------------------------
-  // Recent Transaction Tile
-  // ---------------------------------------------------
-  Widget _buildTransactionTile(String category, String amount, String wallet) {
+  // ======================================================
+  // TRANSACTION TILE WIDGET
+  // ======================================================
+  Widget _buildTransactionTile(
+      String category, String amount, String wallet) {
     final bool isIncome = amount.contains("+");
 
     return Container(
@@ -128,18 +162,19 @@ class DashboardPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Category + Wallet
+          // LEFT SIDE (CATEGORY + WALLET)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(category,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Text(wallet, style: const TextStyle(color: Colors.black54)),
             ],
           ),
 
-          // Amount (Green for income, Red for expense)
+          // RIGHT SIDE (AMOUNT)
           Text(
             amount,
             style: TextStyle(
